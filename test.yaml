@@ -1,0 +1,82 @@
+cmd-list:
+  - &cd-to-home-dir
+    cmd: 'cd ~'
+  - &git-clone-portam-frontend 
+    cmd: 'git clone http://SSSS.com/frontend'
+  - &git-clone-portam-deployment
+    cmd: 'git clone http://SSSS.com/deployment'
+  - &cd-to-prod-env-dir
+    cmd : 'cd ./deployment/prod-env/' 
+  - &execute-script-of-biuld-for-deployment
+    cmd: './script/biuld-for-deployment-of.sh'
+  - &execute-script-of-deploy
+    cmd: './script/deploy-to.sh'
+args-of-server:
+  - &web-ap#1-arg
+    arg: web-ap#1
+  - &web-ap#2-arg
+    arg: web-ap#1
+test-env:
+  severs:
+prod-env:
+  severs:
+    web-ap#1:
+      env-def:
+        host-name: XXX1
+        ip-addr: 10.1.1.1
+        middlewares: &Web-AP#1-middlewares
+          nginx: &Web-AP#1-nginx
+            version: 
+            type: service
+            base-dir: /home/test-user/
+        softwares: 
+          portam-frontend: &Web-AP#1-softwares-portam-frontend
+            port: 80
+            base-dir: /home/test-user/
+            config:
+              base-dir: /home/test-user/
+              file-name: test.conf
+            dependent-services:
+              nginx:
+                <<: *Web-AP#1-nginx
+        scheduled-tasks:
+        logs:  
+      build-for-deployment: &Web-AP#1-build-for-deployment
+        cd-to-home-dir:
+          - *cd-to-home-dir
+        git-clone-portam-frontend:
+          - *git-clone-portam-frontend
+        git-clone-portam-deployment:
+          - *git-clone-portam-deployment
+        cd-to-prod-env-dir:
+          - *cd-to-prod-env-dir
+        execute-script-of-biuld-for-deployment:
+          - *execute-script-of-biuld-for-deployment
+          - *web-ap#1-arg
+      deploy: &Web-AP#1-deploy
+        cd-to-prod-env-dir:
+          - *cd-to-prod-env-dir
+        execute-script-of-deploy:
+          - *execute-script-of-deploy
+          - *web-ap#1-arg
+    web-ap#2:
+      env-def:
+        host-name: XXX2
+        ip-addr: 10.1.1.2
+        middlewares:
+          << : *Web-AP#1-middlewares
+        softwares:
+          portam-frontend:
+            << : *Web-AP#1-softwares-portam-frontend
+        scheduled-tasks:
+        logs:
+      build-for-deployment:
+        << : *Web-AP#1-build-for-deployment
+        execute-script-of-biuld-for-deployment:
+          - *execute-script-of-biuld-for-deployment
+          - *web-ap#2-arg
+      deploy:
+        << : *Web-AP#1-deploy
+        execute-script-of-deploy:
+          - *execute-script-of-deploy
+          - *web-ap#2-arg
