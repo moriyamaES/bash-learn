@@ -1,0 +1,11 @@
+Linux aarch64
+Linux aarch64
+total 28
+-rw------- 1 u0_a37 u0_a37 42 Oct 21 03:55 README.md
+-rw------- 1 u0_a37 u0_a37  3 Oct 22 19:40 cd_test
+-rwx------ 1 u0_a37 u0_a37 30 Oct 21 03:55 hello
+-rw------- 1 u0_a37 u0_a37 20 Oct 22 18:26 hello.sh
+-rw------- 1 u0_a37 u0_a37 28 Oct 22 20:01 log
+-rw------- 1 u0_a37 u0_a37 15 Oct 22 19:25 src_arg_test
+-rwx------ 1 u0_a37 u0_a37 25 Oct 22 18:37 src_test
+-rw------- 1 u0_a37 u0_a37  0 Oct 21 22:14 timestamp
