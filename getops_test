@@ -1,0 +1,12 @@
+while getopts cvi:o: option
+do
+  case $option in
+  c)
+    echo '-cオプションが指定されました'
+  v) 
+    echo '-vオプションが指定されました';;   
+  i) 
+    echo '-iオプションで'"$OPTARG"'が指定されました';; a
+  o)
+    echo '-oオプションで'"$OPTARG"'が指定されました';; ……オプション引数も含めその旨を表示  \?) ……不正なオプションが指定された場合  echo "Usage: $0 [-c] [-v] [-i file] [-o file] [args...]" 1>&2……Usageのエラーメッセージを表示  exit 1;; ……エラーで終了  esac ……case文の終了 done ……while文のループの終了 shift `expr "$OPTIND" - 1` ……OPTINDから1を引いた数だけ位置パラメータをshift if [ $# -ge 1 ]; then ……位置パラメータが1つ以上残っている場合  echo 'オプション以外の引数は'"$@"'です' ……残りの位置パラメータを表示 else ……位置パラメータが残っていない場合  echo 'オプション以外の引数はありません' ……その旨を表示 fi ……if文の終了
+
