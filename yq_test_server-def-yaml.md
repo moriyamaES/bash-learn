@@ -15,7 +15,7 @@
     cat yq_test_server.yaml
     ```
     - The results are below
-        ```sh
+        ```
         servers:
         - name: web#1
             env-def:
