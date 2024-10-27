@@ -12,31 +12,32 @@
 ## Verification
 1. The yaml used for validation is below
     ```bash
+    # コメント
     cat yq_test_server.yaml
     ```
     - The results are below
-```yaml
-servers:
-  - name: web#1
-    ip-adress: 10.1.1.1
-    middlewears: &web1-middlewears
-    nginx:
-        base-dir: /user/local/bin/
-    node:
-        base-dir: /user/local/bin/
-        port: 5000
-    node2:
-        base-dir: /user/local/bin/
-  - name: web#2
-    ip-adress: 10.1.1.10
-    middlewears: &web2-middlewears
-      <<: *web1-middlewears
-      nginx: null
-  - name: web#3
-    ip-adress: 10.1.1.11
-    middlewears:
-      <<: *web2-middlewears
-```
+        ```yaml
+        servers:
+        - name: web#1
+          ip-adress: 10.1.1.1
+          middlewears: &web1-middlewears
+          nginx:
+            base-dir: /user/local/bin/
+          node:
+            base-dir: /user/local/bin/
+            port: 5000
+          node2:
+            base-dir: /user/local/bin/
+        - name: web#2
+          ip-adress: 10.1.1.10
+          middlewears: &web2-middlewears
+            <<: *web1-middlewears
+            nginx: null
+        - name: web#3
+          ip-adress: 10.1.1.11
+          middlewears:
+            <<: *web2-middlewears
+        ```
 
 1. Run the command below
     ```bash
