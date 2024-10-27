@@ -11,7 +11,7 @@
     ```
 ## Verification
 1. The yaml used for validation is below
-    ```
+    ```bash
     cat yq_test_server.yaml
     ```
     - The results are below
@@ -39,7 +39,7 @@ servers:
 ```
 
 1. Run the command below
-    ```
+    ```bash
     yq '(
     .servers.[]
     | select(.name == "web#1")
