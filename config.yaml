@@ -1,0 +1,20 @@
+servers:
+  - name: "web#1"
+    ip-adress: 10.1.1.1
+    middlewears: &"web#1-middlewears"
+      nginx:
+        base-dir: /user/local/bin/
+      node:
+        base-dir: /user/local/bin/
+      node2:
+        base-dir: /user/local/bin/
+  - name: "web#2"
+    ip-adress: 10.1.1.10
+    middlewears: &"web#2-middlewears"
+      <<: *"web#1-middlewears"
+      nginx: null
+  - name: "web#3"
+    ip-adress: 10.1.1.11
+    middlewears: 
+      <<: *"web#2-middlewears"
+
