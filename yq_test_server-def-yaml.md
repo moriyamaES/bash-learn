@@ -127,6 +127,46 @@
         base-dir: /user/local/bin/
         port: 5000
         ```
+1. Run the command below
+    ```bash
+    yq '(
+    .servers.[] 
+    | select(.name == "web#2")
+    | .middlewears
+    | .nginx
+    )' yq_test_server.yaml
+    ```
+    - The results are below
+        ```
+        null
+        ```
+1. Run the command below
+    ```bash
+    yq '(
+    .servers.[]
+    | select(.name == "web#3")
+    | .middlewears
+    | .node
+    )' yq_test_server.yaml
+    ```
+    - The results are below
+        ```
+        base-dir: /user/local/bin/
+        port: 5000
+        ```
+1. Run the command below
+    ```bash
+    yq '(
+    .servers.[]
+    | select(.name == "web#3")
+    | .middlewears
+    | .nginx
+    )' yq_test_server.yaml
+    ```
+    - The results are below
+    ```
+        null
+    ```
 
 ## YAMLのアンカー（`&`）やエイリアス（`*`）名に使える文字は、次のように制約があります。
 
