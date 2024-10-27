@@ -54,13 +54,13 @@
         /user/local/bin/
         ```
 1. Run the command below
-    ```
+    ```bash
     yq '(
-    > .servers.[]
-    > | select(.name == "web#1")
-    > | .middlewears
-    > | .node
-    > )' yq_test_server.yaml
+    .servers.[]
+    | select(.name == "web#1")
+    | .middlewears
+    | .node
+    )' yq_test_server.yaml
     ```
     - The results are below
         ```
@@ -68,12 +68,12 @@
         port: 5000
         ```
 1. Run the command below
-    ```
+    ```bash
     yq '(
-    > .servers.[]
-    > | select(.name == "web#1")
-    > | .middlewears
-    > )' yq_test_server.yaml
+    .servers.[]
+    | select(.name == "web#1")
+    | .middlewears
+    )' yq_test_server.yaml
     ```
     - The results are below
         ```
@@ -102,12 +102,12 @@
 1. Run the command below
     ```
     yq '(
-    > .servers.[]
-    > | select(.name == "web#2")
-    > | .middlewears
-    > | .node
-    > | .base-dir
-    > )' yq_test_server.yaml
+    .servers.[]
+    | select(.name == "web#2")
+    | .middlewears
+    | .node
+    | .base-dir
+    )' yq_test_server.yaml
     ```
     - The results are below
         ```
@@ -116,11 +116,11 @@
 1. Run the command below
     ```
     yq '(
-    > .servers.[]
-    > | select(.name == "web#2")
-    > | .middlewears
-    > | .node
-    > )' yq_test_server.yaml
+    .servers.[]
+    | select(.name == "web#2")
+    | .middlewears
+    | .node
+    )' yq_test_server.yaml
     ```
     - The results are below
         ```
