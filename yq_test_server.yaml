@@ -1,6 +1,5 @@
 servers:
   - name: web#1
-    env-def:
     ip-adress: 10.1.1.1
     middlewears: &web1-middlewears
       nginx:
