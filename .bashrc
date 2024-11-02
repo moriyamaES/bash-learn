@@ -1,5 +1,9 @@
 # .bashrc
 
+# git
+. /usr/share/doc/git/contrib/completion/git-completion.bash
+. /usr/share/doc/git/contrib/completion/git-prompt.sh
+
 GIT_PS1_SHOWDIRTYSTATE=true
 GIT_PS1_SHOWUNTRACKEDFILES=true
 GIT_PS1_SHOWSTASHSTATE=true
