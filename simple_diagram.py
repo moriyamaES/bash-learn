@@ -25,7 +25,6 @@ edge_attr = {
     "labelfontcolor": "red"
 }
 
-
 with Diagram("Portam2のシステム構成図", filename="simple_diagram", show=False, direction="LR",graph_attr=graph_attr):
 
     with Cluster("L2"):
@@ -65,6 +64,22 @@ with Diagram("Portam2のシステム構成図", filename="simple_diagram", show=
 
     with Cluster("共有セグメント"):
 
+        with Cluster("バッチサーバ"):
+            with Cluster("スケジューラー"):
+                cbat = Custom("", "./cron-W.png")
+            with Cluster("ミドルウェア"):
+                pybat = Custom("", "./python.png")
+                shbat = Custom("", "./bash.png")
+            with Cluster("ソフトウェア"):
+                ab = Custom("証跡バックアップ","./software.png")
+            with Cluster("Zabbix-agent"):
+                zbat = Custom("", "./zabbix.png")
+
+            cbat >> pybat
+            cbat >> shbat
+            pybat >> ab
+            shbat >> ab
+
         with Cluster("SMTPサーバ"):
             with Cluster("ミドルウェア"):
                 smtp = Custom("", "./Postfix.png")
@@ -91,10 +106,24 @@ with Diagram("Portam2のシステム構成図", filename="simple_diagram", show=
                 py1 >> pic1
 
             with Cluster("web/AP#2"):
-                with Cluster("Portam-frontend"):
-                    w2 = Nginx("")
-                with Cluster("Portam-backend"):
-                    a2 = Nodejs("")
+                with Cluster("ミドルウェア"):
+                    with Cluster("Portam-frontend"):
+                        w2 = Nginx("")
+                    with Cluster("Portam-backend"):
+                        a2 = Nodejs("")
+                    with Cluster("ランタイム"):
+                        py2 = Custom("", "./python.png")
+                    with Cluster("Zabbix-agent"):
+                        za2 = Custom("", "./zabbix.png")
+                with Cluster("ソフトウェア"):
+                    pf2 = Custom("Portam-frontend","./software.png")
+                    pb2 = Custom("Portam-backend","./software.png")
+                    pic2 = Custom("個人情報チェック", "./software.png")
+                w2 >> pf2
+                a2 >> pb2
+                a2 >> py2
+                py2 >> pic2
+
 
         with Cluster("社外Web/AP"):
 
@@ -129,9 +158,6 @@ with Diagram("Portam2のシステム構成図", filename="simple_diagram", show=
                 psp - psr1
                 psp - psr2
 
-        with Cluster("バッチサーバ"):
-            bat = EC2("")
-
         with Cluster("Nextcloud用LB"):
             stlb = LoadBalancers("")
         
@@ -147,6 +173,9 @@ with Diagram("Portam2のシステム構成図", filename="simple_diagram", show=
                     pf1 = Custom("", "./php-fpm.png")
                 with Cluster("Webサービス"):
                     nxs1 = Custom("", "./nginx-b.png")
+                with Cluster("Zabbix-agent"):
+                    zs1 = Custom("", "./zabbix.png")
+
         nxs1 >> pf1 >> php1 >> nc1 >> r1
         
         with Cluster("ストレージサーバ#2"):
@@ -155,11 +184,15 @@ with Diagram("Portam2のシステム構成図", filename="simple_diagram", show=
             with Cluster("ミドルウェア"):
                 with Cluster("キャッシュサービス"):
                     r2 = Custom("", "./redis.png")
+                with Cluster("ランタイム"):
+                    php2 =  Php("")
                 with Cluster("アプリケーションサービス"):
                     pf2 = Custom("", "./php-fpm.png")
                 with Cluster("Webサービス"):
                     nxs2 = Custom("", "./nginx-b.png")
-        nxs2 >> pf2 >> nc2 >> r2
+                with Cluster("Zabbix-agent"):
+                    zs2 = Custom("", "./zabbix.png")
+        nxs2 >> pf2 >> php2 >> nc2 >> r2
 
         nfs = Storage("NFS")
     
@@ -172,6 +205,10 @@ with Diagram("Portam2のシステム構成図", filename="simple_diagram", show=
     za = Zabbix("")
 
     za1 >> Edge(color="red",  style="bold") >> za
+    za2 >> Edge(color="red",  style="bold") >> za
+    zs1 >> Edge(color="red",  style="bold") >> za
+    zs2 >> Edge(color="red",  style="bold") >> za
+    zbat >> Edge(color="red",  style="bold") >> za
 
     a1 >> Edge(color="blue",  style="bold") >> portam_app_dev_SQL
     a2 >> Edge(color="blue",  style="bold") >> portam_app_dev_SQL
@@ -189,9 +226,9 @@ with Diagram("Portam2のシステム構成図", filename="simple_diagram", show=
     nc2 >> Edge(color="blue",  style="bold") >> nfs
     nc1 >> Edge(color="blue",  style="bold") >> portam_storage_dev_SQL
     nc2 >> Edge(color="blue",  style="bold") >> portam_storage_dev_SQL
-    bat >> Edge(color="blue",  style="bold") >> stlb
-    bat >> Edge(color="blue",  style="bold") >> nfs
-    bat >> Edge(color="blue",  style="bold") >> portam_app_dev_SQL
+    ab >> Edge(color="blue",  style="bold") >> stlb
+    ab >> Edge(color="blue",  style="bold") >> nfs
+    ab >> Edge(color="blue",  style="bold") >> portam_app_dev_SQL
 
     l2u >> Edge(label="ここだ", color="blue",  style="bold") >> l2c
     l2c >> Edge(color="blue",  style="bold") >>l2lb
@@ -239,6 +276,6 @@ with Diagram("Portam2のシステム構成図", filename="simple_diagram", show=
     rp6 >> Edge(color="blue",  style="bold") >> a4
     a1 >> Edge(color="blue",  style="bold") >> sso
     a2 >> Edge(color="blue",  style="bold") >> sso
-    bat >> Edge(color="blue",  style="bold") >> eft
+    ab >> Edge(color="blue",  style="bold") >> eft
     a3 >> Edge(color="blue",  style="bold") >> cindy
     a4 >> Edge(color="blue",  style="bold") >> cindy
