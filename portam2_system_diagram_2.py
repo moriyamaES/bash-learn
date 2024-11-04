@@ -8,7 +8,6 @@ from diagrams.azure.network import LoadBalancers
 from diagrams.aws.general import TraditionalServer
 from diagrams.aws.general import Client
 from diagrams.aws.general import User
-# from diagrams.onprem.network import Nginx
 from diagrams.programming.language import Nodejs
 from diagrams.programming.language import Python
 from diagrams.onprem.monitoring import Zabbix
@@ -27,6 +26,10 @@ graph_attr = {
     "splines":"curved",
 }
 
+# node_bgcolor = "white"
+node_bgcolor = "red"
+node_labelloc = "t"
+
 with Diagram("Portam2のシステム構成図\n", filename="portam2_system_diagram", show=False, direction="BT",graph_attr=graph_attr):
 
     with Cluster("cindy\n(共有セグメント外)"):
@@ -38,8 +41,12 @@ with Diagram("Portam2のシステム構成図\n", filename="portam2_system_diagr
     with Cluster("Zabbix\n(共有セグメント外)"):
         za = Zabbix("")
 
+    # with Cluster("SSO認証基盤\n(共有セグメント外)"):
+    #     sso = TraditionalServer("")
+
     with Cluster("L2"):
         with Cluster("l2-user"):
+        # with Cluster("Bottom\lLeft\l"):
             l2u = User("")
             l2c = Client("l2-client")
         with Cluster("l2-lb"):
@@ -70,7 +77,7 @@ with Diagram("Portam2のシステム構成図\n", filename="portam2_system_diagr
 
     with Cluster("DMZ"):
         with Cluster("dmz-lb"):
-            dmzlb = LoadBalancers("dmz-lb")
+            dmzlb = LoadBalancers("")
 
         with Cluster("rev-proxy#5"):
             rp5 = Custom("", "./nginx-zabbix-argent.png")
@@ -84,9 +91,26 @@ with Diagram("Portam2のシステム構成図\n", filename="portam2_system_diagr
         outu = User("")
         outc = Client("社外-client")
 
+    # with Cluster("共有セグメント", graph_attr={"pencolor":"white", "bgcolor":"white"}):
     with Cluster("共有セグメント"):
 
-        with Cluster("SSO認証基盤\n(共有セグメント外)"):
+
+        # with Cluster("cindy\n(共有セグメント外)"):
+        #     cindy = TraditionalServer("")
+
+        # with Cluster("esb-file-transfer\n(共有セグメント外)"):
+        #     eft = TraditionalServer("")
+
+        # with Cluster("Zabbix\n(共有セグメント外)"):
+        #     za = Zabbix("")
+
+        with Cluster(
+                "SSO認証基盤\n(共有セグメント外)", 
+                graph_attr={
+                        "labelloc":"b", 
+                        "bgcolor":"azure"
+                    }
+                ):
             sso = TraditionalServer("")
 
         with Cluster("バッチサーバ"):
@@ -101,7 +125,12 @@ with Diagram("Portam2のシステム構成図\n", filename="portam2_system_diagr
             zbat >>  Edge(style="invis") >> r3
 
 
-        with Cluster("SMTPサーバ"):
+        with Cluster(
+                "SMTPサーバ", 
+                graph_attr = {
+                    "labelloc":"b", 
+                }
+            ):
             smtp = Custom("", "./Postfix.png")
 
         with Cluster("社内Web/AP"):
@@ -152,22 +181,38 @@ with Diagram("Portam2のシステム構成図\n", filename="portam2_system_diagr
                 # 位置調整用の不可視リンク
                 w4 >>  Edge(style="invis") >> za4
 
-        with Cluster("DBクラスター"):
-            with Cluster("ミドルウェア"):
+        with Cluster("DBクラスター", 
+                graph_attr = {
+                    "labelloc":"b", 
+                }
+        ):
+            with Cluster("ミドルウェア", 
+                graph_attr = {
+                    "labelloc":"b", 
+                }
+            ):
                 with Cluster("DB"):
-                    portam_app_dev = GenericDatabase("portam_app_dev")
+                    portam_app_dev = GenericDatabase(
+                        "portam_app_dev",
+                        bgcolor = node_bgcolor,
+                        labelloc = node_labelloc
+                    )
                         # portam_app_dev_SQL = SQL("")
                     # portam_app_dev_SQL >> portam_app_dev 
                 
-                    portam_storage_dev = GenericDatabase("portam_storage_dev")
+                    portam_storage_dev = GenericDatabase(
+                        "portam_storage_dev",
+                        bgcolor = node_bgcolor,
+                        labelloc = node_labelloc
+                    )
                         # portam_storage_dev_SQL = SQL("")
                     # portam_storage_dev_SQL >> portam_storage_dev 
 
-                # psr2 = Custom("stand-by-1", "./postgresql.png")
-                # psr1 = Custom("stand-by-2", "./postgresql.png")
-                psp = Custom("primary", "./postgresql.png")
-                # psp - psr1
-                # psp - psr2
+                psr1 = Custom("stand-by-2", "./postgresql.png", labelloc = node_labelloc)
+                psr2 = Custom("stand-by-1", "./postgresql.png", labelloc = node_labelloc)
+                psp = Custom("primary", "./postgresql.png" ,labelloc = node_labelloc)
+                psp - psr1
+                psp - psr2
 
         with Cluster("Nextcloud用LB"):
             stlb = LoadBalancers("")
@@ -196,7 +241,11 @@ with Diagram("Portam2のシステム構成図\n", filename="portam2_system_diagr
         # 位置調整用の不可視リンク
         # zs2 >>  Edge(style="invis") >> bls2
 
-        nfs = Storage("NFS")
+        nfs = Storage(
+            "NFS", 
+            bgcolor = node_bgcolor,
+            labelloc = node_labelloc
+        )
 
     # 位置調整用の不可視リンク
     py1 >>  Edge(style="invis") >> sso
@@ -232,6 +281,10 @@ with Diagram("Portam2のシステム構成図\n", filename="portam2_system_diagr
     # https://www.graphviz.org/docs/attrs/constraint/
     a1 >> Edge(color="blue", style="bold", constraint ="false") >> smtp
     a2 >> Edge(color="blue", style="bold", constraint ="false") >> smtp
+
+    # a1 >> Edge(color="blue", style="bold") >> smtp
+    # a2 >> Edge(color="blue", style="bold") >> smtp
+
 
     a1 >> Edge(color="blue",  style="bold") >> stlb
     a2 >> Edge(color="blue",  style="bold") >> stlb
@@ -306,31 +359,23 @@ with Diagram("Portam2のシステム構成図\n", filename="portam2_system_diagr
     w4 << Edge(color="green4",  style="bold") << dmzlb
     a4 << Edge(color="green4",  style="bold") << dmzlb
 
-    a1 >> Edge(color="blue",  style="bold") >> sso
-    a2 >> Edge(color="blue",  style="bold") >> sso
+    # # エッジの追加によるノードの移動を防ぐため、constraint ="false" とする
+    # # 詳細は以下
+    # # https://www.graphviz.org/docs/attrs/constraint/
+    # a1 >> Edge(color="blue", style="bold", constraint ="false") >> sso
+    # a2 >> Edge(color="blue", style="bold", constraint ="false") >> sso
+
+    a1 >> Edge(color="blue", style="bold") >> sso
+    a2 >> Edge(color="blue", style="bold") >> sso
 
     a3 >> Edge(color="blue",  style="bold") >> cindy
     a4 >> Edge(color="blue",  style="bold") >> cindy
 
-    # za1 >> Edge(color="red",  style="bold") >> za
-    # za2 >> Edge(color="red",  style="bold") >> za
-    # za3 >> Edge(color="red",  style="bold") >> za
-    # za4 >> Edge(color="red",  style="bold") >> za
-    # zs1 >> Edge(color="red",  style="bold") >> za
-    # zs2 >> Edge(color="red",  style="bold") >> za
-    # zbat >> Edge(color="red",  style="bold") >> za
-    [za1,za2,za3,za4,zs1,zs2] >> Edge(color="red",  style="bold") >> za
-
-    # rp1  >> Edge(color="red",  style="bold") >> za
-    # rp2  >> Edge(color="red",  style="bold") >> za
-    # rp3  >> Edge(color="red",  style="bold") >> za
-    # rp4  >> Edge(color="red",  style="bold") >> za
-    # rp5  >> Edge(color="red",  style="bold") >> za
-    # rp6  >> Edge(color="red",  style="bold") >> za
+    [za1,za2,za3,za4,zs1,zs2] >> Edge(color="red",  style="dotted") >> za
     
     # エッジの追加によるノードの移動を防ぐため、constraint ="false" とする
     # 詳細は以下
     # https://www.graphviz.org/docs/attrs/constraint/
-    [rp1,rp2,rp3,rp4,rp5,rp6] >> Edge(color="red",  style="bold", constraint ="false") >> za
+    [rp1,rp2,rp3,rp4,rp5,rp6] >> Edge(color="red",  style="dotted", constraint ="false") >> za
 
 

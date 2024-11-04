@@ -1,23 +1,26 @@
-from diagrams import Diagram, Cluster, Edge
-from diagrams.oci.compute import VM
+from diagrams import Diagram, Node, Cluster
 
-graph_attr = {
-    "layout":"dot",
-    "compound":"true",
-    "splines":"spline",
-    }
+with Diagram("\nlabel location", show=False):
 
-with Diagram("cluster to cluster edge", graph_attr=graph_attr, show=False) as diag:
+    with Cluster(
+        "Bottom\\rRight\\r",
+        graph_attr={
+            "labelloc":"b", 
+        }
+    ):
 
-    with Cluster("hoge2"):
-        with Cluster("hoge"):
-            with Cluster("Cluster 1"):
-                c1node12 = VM("c1node11")
+        bot_rgt = Node("Bottom\\rRight\\r", labelloc="b")
+        bot_cen = Node("Bottom\nCenter", labelloc="b")
+        bot_lft = Node("Bottom\lLeft\l", labelloc="b")
 
-    with Cluster("Cluster 2"):
-        c2node1 = VM("c2node1")
+        cen_rgt = Node("Center\\rRight\\r", labelloc="c")
+        cen_cen = Node("Center\nCenter", labelloc="c")
+        cen_lft = Node("Center\lLeft\l", labelloc="c")
 
-    # c1node12 << Edge(color="red", ltail="cluster_Cluster 1", lhead="cluster_Cluster 2") << c2node1
-    c1node12 >> Edge(color="red",style="dashed", lhead="cluster_Cluster 2") >> c2node1
+        top_rgt = Node("Top\\rRight\\r", labelloc="t")
+        top_lft = Node("Top\lLeft\l", labelloc="t")
+        top_cen = Node("Top\nCenter", labelloc="t")
 
-diag
+    bot_lft - bot_cen - bot_rgt
+    cen_lft - cen_cen - cen_rgt
+    top_lft - top_cen - top_rgt
