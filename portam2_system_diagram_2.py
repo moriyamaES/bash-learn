@@ -18,18 +18,22 @@ from diagrams.programming.language import Php
 from diagrams.generic.blank import Blank
 
 # graph_attr = {
-#     "fontsize": "20",
+#     "fontsize": "49",
 #     "layout":"dot",
 #     "compound":"true",
+#     "labelloc":"t",
 #     "splines":"spline",
 # }
 
+# About splines
+# https://www.graphviz.org/docs/attrs/splines/
 graph_attr = {
-    "fontsize": "20",
+    "fontsize": "49",
     "layout":"dot",
     "compound":"true",
+    "labelloc":"t",
+    "splines":"curved",
 }
-
 
 # node_attr = {
 #     'fontsize': '14'
@@ -40,22 +44,18 @@ graph_attr = {
 # "bgcolor": "red"
 # }
 
-with Diagram("Portam2のシステム構成図", filename="portam2_system_diagram", show=False, direction="BT",graph_attr=graph_attr):
+with Diagram("Portam2のシステム構成図\n", filename="portam2_system_diagram", show=False, direction="BT",graph_attr=graph_attr):
 
-    # sso = TraditionalServer("SSO認証基盤")
-    eft = TraditionalServer("esb-file-transfer")
-    cindy = TraditionalServer("cindy")
-    za = Zabbix("")
+    with Cluster("cindy\n(共有セグメント外)"):
+        cindy = TraditionalServer("")
 
-    with Cluster("sso"):
-        sso = TraditionalServer("SSO認証基盤")
-        blank1 = Blank('Blank')
-        blank2 = Blank('Blank')
-        blank3 = Blank('Blank')
-        blank4 = Blank('Blank')
+    with Cluster("Zabbix\n(共有セグメント外)"):
+        za = Zabbix("")
+
+    with Cluster("esb-file-transfer\n(共有セグメント外)"):
+        eft = TraditionalServer("")
 
     with Cluster("L2"):
-        # blank = Blank('Blank')
         with Cluster("l2-user"):
             l2u = User("")
             l2c = Client("l2-client")
@@ -93,6 +93,9 @@ with Diagram("Portam2のシステム構成図", filename="portam2_system_diagram
         outc = Client("社外-client")
 
     with Cluster("共有セグメント"):
+
+        with Cluster("SSO認証基盤\n(共有セグメント外)"):
+            sso = TraditionalServer("")
 
         with Cluster("バッチサーバ"):
             with Cluster("スケジューラー"):
@@ -147,13 +150,13 @@ with Diagram("Portam2のシステム構成図", filename="portam2_system_diagram
             with Cluster("ミドルウェア"):
                 with Cluster("DB"):
                     with Cluster("portam_app_dev"):
-                        portam_app_dev = GenericDatabase("テーブル")
-                        portam_app_dev_SQL = SQL("ストアド")
+                        portam_app_dev = GenericDatabase("Tables")
+                        portam_app_dev_SQL = SQL("")
                     portam_app_dev_SQL >> portam_app_dev 
                 
                     with Cluster("portam_storage_dev"):
-                        portam_storage_dev = GenericDatabase("テーブル")
-                        portam_storage_dev_SQL = SQL("ストアド")
+                        portam_storage_dev = GenericDatabase("Tables")
+                        portam_storage_dev_SQL = SQL("")
                     portam_storage_dev_SQL >> portam_storage_dev 
 
                 psr2 = Custom("stand-by-1", "./postgresql.png")
@@ -200,20 +203,14 @@ with Diagram("Portam2のシステム構成図", filename="portam2_system_diagram
 
         nfs = Storage("NFS")
 
-    # sso >> Edge(color="red", ltail="cluster_sso", lhead="cluster_共有セグメント") >> nfs
-
-    # sso >> Edge(color="red", ltail="cluster_sso", lhead="cluster_共有セグメント") >> nfs
-
-    # blank >> w1
-    # blank >> sso
-    # blank >> l2u  
+    # 位置調整用の不可視リンク
+    py1 >>  Edge(style="invis") >> sso
+    py2 >>  Edge(style="invis") >> sso 
 
     nxs1 >> r2
     nxs2 >> r1
     nxs1 >> r3
     nxs2 >> r3
-
-    # eft >> sso
 
     za1 >> Edge(color="red",  style="bold") >> za
     za2 >> Edge(color="red",  style="bold") >> za
