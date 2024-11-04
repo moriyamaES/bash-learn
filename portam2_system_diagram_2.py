@@ -3,7 +3,6 @@ from diagrams.aws.compute import EC2
 from diagrams.aws.database import RDS
 from diagrams.onprem.database import PostgreSQL
 from diagrams.generic.storage import Storage 
-# from diagrams.programming.flowchart import Database
 from diagrams.custom import Custom
 from diagrams.azure.network import LoadBalancers
 from diagrams.aws.general import TraditionalServer
@@ -16,14 +15,47 @@ from diagrams.onprem.monitoring import Zabbix
 from diagrams.aws.general import GenericDatabase
 from diagrams.generic.database import SQL
 from diagrams.programming.language import Php
+from diagrams.generic.blank import Blank
+
+# graph_attr = {
+#     "fontsize": "20",
+#     "layout":"dot",
+#     "compound":"true",
+#     "splines":"spline",
+# }
 
 graph_attr = {
-    "fontsize": "20"
+    "fontsize": "20",
+    "layout":"dot",
+    "compound":"true",
 }
 
-with Diagram("Portam2のシステム構成図", filename="portam2_system_diagram", show=False, direction="LR",graph_attr=graph_attr):
+
+# node_attr = {
+#     'fontsize': '14'
+# }
+
+# node_attr = {
+# "fontsize": "45",
+# "bgcolor": "red"
+# }
+
+with Diagram("Portam2のシステム構成図", filename="portam2_system_diagram", show=False, direction="BT",graph_attr=graph_attr):
+
+    # sso = TraditionalServer("SSO認証基盤")
+    eft = TraditionalServer("esb-file-transfer")
+    cindy = TraditionalServer("cindy")
+    za = Zabbix("")
+
+    with Cluster("sso"):
+        sso = TraditionalServer("SSO認証基盤")
+        blank1 = Blank('Blank')
+        blank2 = Blank('Blank')
+        blank3 = Blank('Blank')
+        blank4 = Blank('Blank')
 
     with Cluster("L2"):
+        # blank = Blank('Blank')
         with Cluster("l2-user"):
             l2u = User("")
             l2c = Client("l2-client")
@@ -35,7 +67,7 @@ with Diagram("Portam2のシステム構成図", filename="portam2_system_diagram
 
         with Cluster("rev-proxy#2"):
             rp2 = Nginx("")
-
+            
     with Cluster("L3/L4"):
         with Cluster("l3-user"):
             l3u = User("")
@@ -75,7 +107,6 @@ with Diagram("Portam2のシステム構成図", filename="portam2_system_diagram
             smtp = Custom("", "./Postfix.png")
 
         with Cluster("社内Web/AP"):
-
             with Cluster("web/AP#1"):
                 with Cluster("Portam-frontend"):
                     w1 = Custom("", "./nginx-b.png")
@@ -116,12 +147,12 @@ with Diagram("Portam2のシステム構成図", filename="portam2_system_diagram
             with Cluster("ミドルウェア"):
                 with Cluster("DB"):
                     with Cluster("portam_app_dev"):
-                        portam_app_dev = GenericDatabase("")
+                        portam_app_dev = GenericDatabase("テーブル")
                         portam_app_dev_SQL = SQL("ストアド")
                     portam_app_dev_SQL >> portam_app_dev 
                 
                     with Cluster("portam_storage_dev"):
-                        portam_storage_dev = GenericDatabase("")
+                        portam_storage_dev = GenericDatabase("テーブル")
                         portam_storage_dev_SQL = SQL("ストアド")
                     portam_storage_dev_SQL >> portam_storage_dev 
 
@@ -168,16 +199,21 @@ with Diagram("Portam2のシステム構成図", filename="portam2_system_diagram
         nxs2 >> r2
 
         nfs = Storage("NFS")
-    
+
+    # sso >> Edge(color="red", ltail="cluster_sso", lhead="cluster_共有セグメント") >> nfs
+
+    # sso >> Edge(color="red", ltail="cluster_sso", lhead="cluster_共有セグメント") >> nfs
+
+    # blank >> w1
+    # blank >> sso
+    # blank >> l2u  
+
     nxs1 >> r2
     nxs2 >> r1
     nxs1 >> r3
     nxs2 >> r3
 
-    sso = TraditionalServer("SSO認証基盤")
-    eft = TraditionalServer("esb-file-transfer")
-    cindy = TraditionalServer("cindy")
-    za = Zabbix("")
+    # eft >> sso
 
     za1 >> Edge(color="red",  style="bold") >> za
     za2 >> Edge(color="red",  style="bold") >> za
@@ -253,6 +289,8 @@ with Diagram("Portam2のシステム構成図", filename="portam2_system_diagram
     rp6 >> Edge(color="blue",  style="bold") >> a4
     a1 >> Edge(color="blue",  style="bold") >> sso
     a2 >> Edge(color="blue",  style="bold") >> sso
+    # sso << Edge(color="blue",  style="bold") << a1
+    # sso << Edge(color="blue",  style="bold") << 12
     pybat >> Edge(color="blue",  style="bold") >> eft
     a3 >> Edge(color="blue",  style="bold") >> cindy
     a4 >> Edge(color="blue",  style="bold") >> cindy
