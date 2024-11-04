@@ -25,42 +25,44 @@ edge_attr = {
     "labelfontcolor": "red"
 }
 
-with Diagram("Portam2のシステム構成図", filename="simple_diagram", show=False, direction="LR",graph_attr=graph_attr):
+with Diagram("Portam2のシステム構成図", filename="portam2_system_diagram", show=False, direction="LR",graph_attr=graph_attr):
 
-    with Cluster("L2"):
-        l2u = User("l2-user")
-        l2c = Client("l2-client")
-        with Cluster("l2-lb"):
-            l2lb = LoadBalancers("")
+    with Cluster("テスト"):
 
-        with Cluster("rev-proxy#1"):
-            rp1 = Nginx("")
+        with Cluster("L2"):
+            l2u = User("l2-user")
+            l2c = Client("l2-client")
+            with Cluster("l2-lb"):
+                l2lb = LoadBalancers("")
 
-        with Cluster("rev-proxy#2"):
-            rp2 = Nginx("")
+            with Cluster("rev-proxy#1"):
+                rp1 = Nginx("")
 
-    with Cluster("L3/L4"):
-        l3u = User("l3-user")
-        l3c = Client("l3-client")
-        with Cluster("l3-lb"):
-            l3lb = LoadBalancers("")
+            with Cluster("rev-proxy#2"):
+                rp2 = Nginx("")
 
-        with Cluster("rev-proxy#3"):
-            rp3 = Nginx("")
-        with Cluster("rev-proxy#4"):
-            rp4 = Nginx("")
+        with Cluster("L3/L4"):
+            l3u = User("l3-user")
+            l3c = Client("l3-client")
+            with Cluster("l3-lb"):
+                l3lb = LoadBalancers("")
 
-    with Cluster("DMZ"):
-        with Cluster("dmz-lb"):
-            dmzlb = LoadBalancers("dmz-lb")
-        with Cluster("rev-proxy#6"):
-            rp6 = Nginx("")
-        with Cluster("rev-proxy#5"):
-            rp5 = Nginx("")
+            with Cluster("rev-proxy#3"):
+                rp3 = Nginx("")
+            with Cluster("rev-proxy#4"):
+                rp4 = Nginx("")
 
-    with Cluster("社外"):
-        outu = User("社外-user")
-        outc = Client("社外-client")
+        with Cluster("DMZ"):
+            with Cluster("dmz-lb"):
+                dmzlb = LoadBalancers("dmz-lb")
+            with Cluster("rev-proxy#6"):
+                rp6 = Nginx("")
+            with Cluster("rev-proxy#5"):
+                rp5 = Nginx("")
+
+        with Cluster("社外"):
+            outu = User("社外-user")
+            outc = Client("社外-client")
 
     with Cluster("共有セグメント"):
 
