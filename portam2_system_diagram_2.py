@@ -8,7 +8,7 @@ from diagrams.azure.network import LoadBalancers
 from diagrams.aws.general import TraditionalServer
 from diagrams.aws.general import Client
 from diagrams.aws.general import User
-from diagrams.onprem.network import Nginx
+# from diagrams.onprem.network import Nginx
 from diagrams.programming.language import Nodejs
 from diagrams.programming.language import Python
 from diagrams.onprem.monitoring import Zabbix
@@ -16,14 +16,6 @@ from diagrams.aws.general import GenericDatabase
 from diagrams.generic.database import SQL
 from diagrams.programming.language import Php
 from diagrams.generic.blank import Blank
-
-# graph_attr = {
-#     "fontsize": "49",
-#     "layout":"dot",
-#     "compound":"true",
-#     "labelloc":"t",
-#     "splines":"spline",
-# }
 
 # About splines
 # https://www.graphviz.org/docs/attrs/splines/
@@ -35,25 +27,16 @@ graph_attr = {
     "splines":"curved",
 }
 
-# node_attr = {
-#     'fontsize': '14'
-# }
-
-# node_attr = {
-# "fontsize": "45",
-# "bgcolor": "red"
-# }
-
 with Diagram("Portam2のシステム構成図\n", filename="portam2_system_diagram", show=False, direction="BT",graph_attr=graph_attr):
 
     with Cluster("cindy\n(共有セグメント外)"):
         cindy = TraditionalServer("")
 
-    with Cluster("Zabbix\n(共有セグメント外)"):
-        za = Zabbix("")
-
     with Cluster("esb-file-transfer\n(共有セグメント外)"):
         eft = TraditionalServer("")
+
+    with Cluster("Zabbix\n(共有セグメント外)"):
+        za = Zabbix("")
 
     with Cluster("L2"):
         with Cluster("l2-user"):
@@ -63,10 +46,12 @@ with Diagram("Portam2のシステム構成図\n", filename="portam2_system_diagr
             l2lb = LoadBalancers("")
 
         with Cluster("rev-proxy#1"):
-            rp1 = Nginx("")
-
+            rp1 = Custom("", "./nginx-zabbix-argent.png")
+            # zrp1 = Custom("", "./zabbix-agent.png")
+            
         with Cluster("rev-proxy#2"):
-            rp2 = Nginx("")
+            rp2 = Custom("", "./nginx-zabbix-argent.png")
+            # zrp2 = Custom("", "./zabbix-agent.png")
             
     with Cluster("L3/L4"):
         with Cluster("l3-user"):
@@ -76,20 +61,27 @@ with Diagram("Portam2のシステム構成図\n", filename="portam2_system_diagr
             l3lb = LoadBalancers("")
 
         with Cluster("rev-proxy#3"):
-            rp3 = Nginx("")
+            rp3 = Custom("", "./nginx-zabbix-argent.png")
+            # zrp3 = Custom("", "./zabbix-agent.png")
+
         with Cluster("rev-proxy#4"):
-            rp4 = Nginx("")
+            rp4 = Custom("", "./nginx-zabbix-argent.png")
+            # zrp4 = Custom("", "./zabbix-agent.png")
 
     with Cluster("DMZ"):
         with Cluster("dmz-lb"):
             dmzlb = LoadBalancers("dmz-lb")
-        with Cluster("rev-proxy#6"):
-            rp6 = Nginx("")
+
         with Cluster("rev-proxy#5"):
-            rp5 = Nginx("")
+            rp5 = Custom("", "./nginx-zabbix-argent.png")
+            # zrp5 = Custom("", "./zabbix-agent.png")
+
+        with Cluster("rev-proxy#6"):
+            rp6 = Custom("", "./nginx-zabbix-argent.png")
+            # zrp6 = Custom("", "./zabbix-agent.png")
 
     with Cluster("社外-user"):
-        outu = User("社外-user")
+        outu = User("")
         outc = Client("社外-client")
 
     with Cluster("共有セグメント"):
@@ -101,10 +93,13 @@ with Diagram("Portam2のシステム構成図\n", filename="portam2_system_diagr
             with Cluster("スケジューラー"):
                 with Cluster("証跡バックアップ"):
                     pybat = Custom("", "./bash-pyton.png")
-            with Cluster("Zabbix-agent"):
-                zbat = Custom("", "./zabbix.png")
+            zbat = Custom("", "./zabbix-agent.png")
             with Cluster("キャッシュサービス"):
                 r3 = Custom("", "./redis.png")
+            # 位置調整用の不可視リンク
+            zbat >>  Edge(style="invis") >> pybat 
+            zbat >>  Edge(style="invis") >> r3
+
 
         with Cluster("SMTPサーバ"):
             smtp = Custom("", "./Postfix.png")
@@ -117,89 +112,89 @@ with Diagram("Portam2のシステム構成図\n", filename="portam2_system_diagr
                     a1 = Nodejs("")
                 with Cluster("個人情報チェック"):
                     py1 = Custom("", "./python.png")
-                with Cluster("Zabbix-agent"):
-                    za1 = Custom("", "./zabbix.png")
+                za1 = Custom("", "./zabbix-agent.png")
                 a1 >> py1
+                # 位置調整用の不可視リンク
+                w1 >> Edge(style="invis") >> za1
+                # 位置調整用の不可視リンク
+                py1 >> Edge(style="invis") >> smtp
 
             with Cluster("web/AP#2"):
                 with Cluster("Portam-frontend"):
-                    w2 = Nginx("")
+                    w2 = Custom("", "./nginx-b.png")
                 with Cluster("Portam-backend"):
                     a2 = Nodejs("")
                 with Cluster("個人情報チェック"):
                     py2 = Custom("", "./python.png")
-                with Cluster("Zabbix-agent"):
-                    za2 = Custom("", "./zabbix.png")
+                za2 = Custom("", "./zabbix-agent.png")
                 a2 >> py2
+                # 位置調整用の不可視リンク
+                w2 >>  Edge(style="invis") >> za2
 
         with Cluster("社外Web/AP"):
 
             with Cluster("web/AP#3"):
                 with Cluster("Portam-frontend"):
-                    w3 = Nginx("")
+                    w3 = Custom("", "./nginx-b.png")
                 with Cluster("Portam-backend"):
                     a3 = Nodejs("")
+                za3 = Custom("", "./zabbix-agent.png")
+                # 位置調整用の不可視リンク
+                w3 >>  Edge(style="invis") >> za3
+
 
             with Cluster("web/AP#4"):
                 with Cluster("Portam-frontend"):
-                    w4 = Nginx("")
+                    w4 = Custom("", "./nginx-b.png")
                 with Cluster("Portam-backend"):
                     a4 = Nodejs("")
+                za4 = Custom("", "./zabbix-agent.png")
+                # 位置調整用の不可視リンク
+                w4 >>  Edge(style="invis") >> za4
 
         with Cluster("DBクラスター"):
             with Cluster("ミドルウェア"):
                 with Cluster("DB"):
-                    with Cluster("portam_app_dev"):
-                        portam_app_dev = GenericDatabase("Tables")
-                        portam_app_dev_SQL = SQL("")
-                    portam_app_dev_SQL >> portam_app_dev 
+                    portam_app_dev = GenericDatabase("portam_app_dev")
+                        # portam_app_dev_SQL = SQL("")
+                    # portam_app_dev_SQL >> portam_app_dev 
                 
-                    with Cluster("portam_storage_dev"):
-                        portam_storage_dev = GenericDatabase("Tables")
-                        portam_storage_dev_SQL = SQL("")
-                    portam_storage_dev_SQL >> portam_storage_dev 
+                    portam_storage_dev = GenericDatabase("portam_storage_dev")
+                        # portam_storage_dev_SQL = SQL("")
+                    # portam_storage_dev_SQL >> portam_storage_dev 
 
-                psr2 = Custom("stand-by-1", "./postgresql.png")
-                psr1 = Custom("stand-by-2", "./postgresql.png")
+                # psr2 = Custom("stand-by-1", "./postgresql.png")
+                # psr1 = Custom("stand-by-2", "./postgresql.png")
                 psp = Custom("primary", "./postgresql.png")
-                psp - psr1
-                psp - psr2
+                # psp - psr1
+                # psp - psr2
 
         with Cluster("Nextcloud用LB"):
             stlb = LoadBalancers("")
         
         with Cluster("ストレージサーバ#1"):
-            # with Cluster("ソフトウェア"):
-            #     nc1 = Custom("", "./nextcloud.png")
             with Cluster("キャッシュサービス"):
                 r1 = Custom("", "./redis.png")
-            # with Cluster("ランタイム"):
-            #     php1 =  Php("")
-            # with Cluster("アプリケーションサービス"):
-            #     pf1 = Custom("", "./php-fpm.png")
             with Cluster("Nextcoloud"):
                 nxs1 = Custom("", "./nextclod-all.png")
-            with Cluster("Zabbix-agent"):
-                zs1 = Custom("", "./zabbix.png")
-
-        # nxs1 >> pf1 >> php1 >> nc1 >> r1
+            with Cluster("スケジューラー"):
+                with Cluster("証跡バックアップ\n（緊急用）"):
+                    pys1 = Custom("", "./bash-pyton.png")
+            zs1 = Custom("", "./zabbix-agent.png")
         nxs1 >> r1
-        
+        # 位置調整用の不可視リンク
+        zs1 >>  Edge(style="invis") >> pys1
+
         with Cluster("ストレージサーバ#2"):
-            # with Cluster("ソフトウェア"):
-            #     nc2 = Custom("", "./nextcloud.png")
             with Cluster("キャッシュサービス"):
                 r2 = Custom("", "./redis.png")
-            # with Cluster("ランタイム"):
-            #     php2 =  Php("")
-            # with Cluster("アプリケーションサービス"):
-            #     pf2 = Custom("", "./php-fpm.png")
             with Cluster("Nextcoloud"):
                 nxs2 = Custom("", "./nextclod-all.png")
-            with Cluster("Zabbix-agent"):
-                zs2 = Custom("", "./zabbix.png")
-        # nxs2 >> pf2 >> php2 >> nc2 >> r2
+            # bls2 = Blank("ぶらんく")
+            zs2 = Custom("", "./zabbix-agent.png")
         nxs2 >> r2
+        # 位置調整用の不可視リンク
+        # zs2 >>  Edge(style="invis") >> bls2
 
         nfs = Storage("NFS")
 
@@ -212,82 +207,130 @@ with Diagram("Portam2のシステム構成図\n", filename="portam2_system_diagr
     nxs1 >> r3
     nxs2 >> r3
 
-    za1 >> Edge(color="red",  style="bold") >> za
-    za2 >> Edge(color="red",  style="bold") >> za
-    zs1 >> Edge(color="red",  style="bold") >> za
-    zs2 >> Edge(color="red",  style="bold") >> za
-    zbat >> Edge(color="red",  style="bold") >> za
+    # rp1 >>  Edge(style="invis") >> zrp1
+    # rp1 >> zrp1
 
-    a1 >> Edge(color="blue",  style="bold") >> portam_app_dev_SQL
-    a2 >> Edge(color="blue",  style="bold") >> portam_app_dev_SQL
-    a3 >> Edge(color="blue",  style="bold") >> portam_app_dev_SQL
-    a4 >> Edge(color="blue",  style="bold") >> portam_app_dev_SQL
-    a1 >> Edge(color="blue",  style="bold") >> smtp
-    a2 >> Edge(color="blue",  style="bold") >> smtp
+    # zrp1 >> Edge(color="red",  style="bold") >> za
+    # zrp2 >> Edge(color="red",  style="bold") >> za
+    # zrp3 >> Edge(color="red",  style="bold") >> za
+    # zrp4 >> Edge(color="red",  style="bold") >> za
+    # zrp5 >> Edge(color="red",  style="bold") >> za
+    # zrp6 >> Edge(color="red",  style="bold") >> za
+
+    # a1 >> Edge(color="blue",  style="bold") >> portam_app_dev_SQL
+    # a2 >> Edge(color="blue",  style="bold") >> portam_app_dev_SQL
+    # a3 >> Edge(color="blue",  style="bold") >> portam_app_dev_SQL
+    # a4 >> Edge(color="blue",  style="bold") >> portam_app_dev_SQL
+
+    a1 >> Edge(color="blue",  style="bold") >> portam_app_dev
+    a2 >> Edge(color="blue",  style="bold") >> portam_app_dev
+    a3 >> Edge(color="blue",  style="bold") >> portam_app_dev
+    a4 >> Edge(color="blue",  style="bold") >> portam_app_dev
+
+    # エッジの追加によるノードの移動を防ぐため、constraint ="false" とする
+    # 詳細は以下
+    # https://www.graphviz.org/docs/attrs/constraint/
+    a1 >> Edge(color="blue", style="bold", constraint ="false") >> smtp
+    a2 >> Edge(color="blue", style="bold", constraint ="false") >> smtp
+
     a1 >> Edge(color="blue",  style="bold") >> stlb
     a2 >> Edge(color="blue",  style="bold") >> stlb
     a3 >> Edge(color="blue",  style="bold") >> stlb
     a4 >> Edge(color="blue",  style="bold") >> stlb
     stlb >> Edge(color="blue",  style="bold") >> nxs1
     stlb >> Edge(color="blue",  style="bold") >> nxs2
-    # nc1 >> Edge(color="blue",  style="bold") >> nfs
     nxs1 >> Edge(color="blue",  style="bold") >> nfs
-    # nc2 >> Edge(color="blue",  style="bold") >> nfs
     nxs2 >> Edge(color="blue",  style="bold") >> nfs
-    nxs1 >> Edge(color="blue",  style="bold") >> portam_storage_dev_SQL
-    nxs2 >> Edge(color="blue",  style="bold") >> portam_storage_dev_SQL
-    pybat >> Edge(color="blue",  style="bold") >> stlb
+
+    nxs1 >> Edge(color="blue",  style="bold") >> portam_storage_dev
+    nxs2 >> Edge(color="blue",  style="bold") >> portam_storage_dev
+
+    pybat << Edge(color="blue",  style="bold") << stlb
     pybat >> Edge(color="blue",  style="bold") >> nfs
-    pybat >> Edge(color="blue",  style="bold") >> portam_app_dev_SQL
+    pybat >> Edge(color="blue",  style="bold") >> portam_app_dev
+    pybat >> Edge(color="blue",  style="bold") >> eft
+    
+    # エッジの追加によるノードの移動を防ぐため、constraint ="false" とする
+    # 詳細は以下
+    # https://www.graphviz.org/docs/attrs/constraint/
+    pys1 <<  Edge(color="blue", style="dashed", constraint ="false") << stlb
 
-    # l2u >> Edge(label="ここだ", color="blue",  style="bold") >> l2c
-    l2c >> Edge(color="blue",  style="bold") >>l2lb
-    l2lb >> Edge(color="blue",  style="bold") >> rp1
-    l2lb >> Edge(color="blue",  style="bold") >> rp2
+    pys1 >> Edge(color="blue",  style="dashed") >> nfs
+    pys1 >> Edge(color="blue",  style="dashed") >> portam_app_dev
+    pys1 >> Edge(color="blue",  style="dashed") >> eft
 
-    # l3u >> Edge(color="blue",  style="bold") >> l3c
+    l2c >> Edge(color="blue",  style="dashed,bold") >>l2lb
+    l2lb >> Edge(color="blue",  style="dashed,bold") >> rp1
+    l2lb >> Edge(color="blue",  style="dashed,bold") >> rp2
+
     l3c >> Edge(color="blue",  style="bold") >> l3lb
     l3lb >> Edge(color="blue",  style="bold") >> rp3
     l3lb >> Edge(color="blue",  style="bold") >> rp4
 
-    # outu >> Edge(color="blue",  style="bold") >> outc
     outc >> Edge(color="blue",  style="bold") >> dmzlb
     dmzlb >> Edge(color="blue",  style="bold") >> rp5
     dmzlb >> Edge(color="blue",  style="bold") >> rp6
 
-    rp1 >> Edge(color="blue",  style="bold") >> w1
-    rp1 >> Edge(color="blue",  style="bold") >> a1
+    rp1 >> Edge(color="blue",  style="dashed,bold") >> w1
+    rp1 >> Edge(color="blue",  style="dashed,bold") >> a1
 
-    # w1 >> Edge(label="Portam-backendにL2用LB経由でアクセス", color="red",  style="bold", edge_attr=edge_attr) >> l2lb
-    w1 >> Edge(color="green4",  style="bold") >> l2lb
-    a1 >> Edge(color="green4",  style="bold") >> l2lb
+    w1 << Edge(color="green4",  style="dashed,bold") << l2lb
+    a1 << Edge(color="green4",  style="dashed,bold") << l2lb
     
-    rp2 >> Edge(color="blue",  style="bold") >> w2
-    rp2 >> Edge(color="blue",  style="bold") >> a2
+    rp2 >> Edge(color="blue",  style="dashed,bold") >> w2
+    rp2 >> Edge(color="blue",  style="dashed,bold") >> a2
 
-    w2 >> Edge(color="green4",  style="bold") >> l2lb
-    a2 >> Edge(color="green4",  style="bold") >> l2lb
+    w2 << Edge(color="green4",  style="dashed,bold") << l2lb
+    a2 << Edge(color="green4",  style="dashed,bold") << l2lb
 
     rp3 >> Edge(color="blue",  style="bold") >> w1
     rp3 >> Edge(color="blue",  style="bold") >> a1
 
-    w1 >> Edge(color="green4",  style="bold") >> l3lb
-    a1 >> Edge(color="green4",  style="bold") >> l3lb
+    w1 << Edge(color="green4",  style="bold") << l3lb
+    a1 << Edge(color="green4",  style="bold") << l3lb
 
     rp4 >> Edge(color="blue",  style="bold") >> w2
     rp4 >> Edge(color="blue",  style="bold") >> a2
 
-    w2 >> Edge(color="green4",  style="bold") >> l3lb
-    a2 >> Edge(color="green4",  style="bold") >> l3lb
+    w2 << Edge(color="green4",  style="bold") << l3lb
+    a2 << Edge(color="green4",  style="bold") << l3lb
  
     rp5 >> Edge(color="blue",  style="bold") >> w3
     rp5 >> Edge(color="blue",  style="bold") >> a3
     rp6 >> Edge(color="blue",  style="bold") >> w4
     rp6 >> Edge(color="blue",  style="bold") >> a4
+
+    w3 << Edge(color="green4",  style="bold") << dmzlb
+    a3 << Edge(color="green4",  style="bold") << dmzlb
+
+    w4 << Edge(color="green4",  style="bold") << dmzlb
+    a4 << Edge(color="green4",  style="bold") << dmzlb
+
     a1 >> Edge(color="blue",  style="bold") >> sso
     a2 >> Edge(color="blue",  style="bold") >> sso
-    # sso << Edge(color="blue",  style="bold") << a1
-    # sso << Edge(color="blue",  style="bold") << 12
-    pybat >> Edge(color="blue",  style="bold") >> eft
+
     a3 >> Edge(color="blue",  style="bold") >> cindy
     a4 >> Edge(color="blue",  style="bold") >> cindy
+
+    # za1 >> Edge(color="red",  style="bold") >> za
+    # za2 >> Edge(color="red",  style="bold") >> za
+    # za3 >> Edge(color="red",  style="bold") >> za
+    # za4 >> Edge(color="red",  style="bold") >> za
+    # zs1 >> Edge(color="red",  style="bold") >> za
+    # zs2 >> Edge(color="red",  style="bold") >> za
+    # zbat >> Edge(color="red",  style="bold") >> za
+    [za1,za2,za3,za4,zs1,zs2] >> Edge(color="red",  style="bold") >> za
+
+    # rp1  >> Edge(color="red",  style="bold") >> za
+    # rp2  >> Edge(color="red",  style="bold") >> za
+    # rp3  >> Edge(color="red",  style="bold") >> za
+    # rp4  >> Edge(color="red",  style="bold") >> za
+    # rp5  >> Edge(color="red",  style="bold") >> za
+    # rp6  >> Edge(color="red",  style="bold") >> za
+    
+    # エッジの追加によるノードの移動を防ぐため、constraint ="false" とする
+    # 詳細は以下
+    # https://www.graphviz.org/docs/attrs/constraint/
+    [rp1,rp2,rp3,rp4,rp5,rp6] >> Edge(color="red",  style="bold", constraint ="false") >> za
+
+

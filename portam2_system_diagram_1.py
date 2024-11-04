@@ -3,7 +3,6 @@ from diagrams.aws.compute import EC2
 from diagrams.aws.database import RDS
 from diagrams.onprem.database import PostgreSQL
 from diagrams.generic.storage import Storage 
-# from diagrams.programming.flowchart import Database
 from diagrams.custom import Custom
 from diagrams.azure.network import LoadBalancers
 from diagrams.aws.general import TraditionalServer
