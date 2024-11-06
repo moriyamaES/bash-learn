@@ -59,9 +59,9 @@ servers:
   - name: &rev-proxy-1-name
           rev-proxy#1 
     network-interfaces:
-      - - &rev-proxy-1-ip-address
-          ip-address: 10.18.134.242
-        - netmask: 255.255.255.0
+      - ip-address: &rev-proxy-1-ip-address
+                    10.18.134.242
+        netmask: 255.255.255.0
     middleware: &rev-proxy-1-middleware
       - type: service
         name: &rev-proxy-service-name
@@ -70,110 +70,88 @@ servers:
               80
     destinations: &rev-proxy-1-destinations
       - name: *web-ap-1-name
-        <<: *web-ap-1-ip-address
+        ip-address: *web-ap-1-ip-address
         port: *web-service-port
       - name: *web-ap-1-name  
-        <<: *web-ap-1-ip-address
+        ip-address: *web-ap-1-ip-address
         port: *ap-service-port
   - name: &rev-proxy-2-name
           rev-proxy#2 
     network-interfaces:
-      - - &rev-proxy-2-ip-address
-          ip-address: 10.18.134.243
-        - netmask: 255.255.255.0
+      - ip-address: &rev-proxy-2-ip-address
+                    10.18.134.243
+        netmask: 255.255.255.0
     middleware:
       *rev-proxy-1-middleware
     destinations: &rev-proxy-1-destinations
       - name: *web-ap-2-name
-        <<: *web-ap-2-ip-address
+        ip-address: *web-ap-2-ip-address
         port: *web-service-port
       - name: *web-ap-2-name
-      - <<: *web-ap-2-ip-address
+      - ip-address: *web-ap-2-ip-address
         port: *ap-service-port
   - name: &rev-proxy-3-name
           rev-proxy#3
     network-interfaces:
-      - - &rev-proxy-3-ip-address
-          ip-address: 10.86.2.109
+      - ip-address: &rev-proxy-3-ip-address
+                    10.86.2.109
     middleware:
       *rev-proxy-1-middleware
     destinations: &rev-proxy-1-destinations
-      - name:
-          - *web-ap-1-name
-        <<: *web-ap-1-ip-address
-        port:
-          - *web-service-port
-      - name:
-          - *web-ap-1-name  
-        <<: *web-ap-1-ip-address
-        port: 
-          - *ap-service-port
-  - name: 
-      - &rev-proxy-4-name
-        rev-proxy#4
-    ip-addresses:
-      - &rev-proxy-4-ip-address
-        ip-address:
-          - 10.86.2.110
+      - name: *web-ap-1-name
+        ip-address: *web-ap-1-ip-address
+        port: *web-service-port
+      - name: *web-ap-1-name  
+        ip-address: *web-ap-1-ip-address
+        port: *ap-service-port
+  - name: &rev-proxy-4-name
+          rev-proxy#4
+    network-interfaces:
+      - ip-address: &rev-proxy-4-ip-address
+                    10.86.2.110
     middleware:
       *rev-proxy-1-middleware
     destinations: &rev-proxy-1-destinations
-      - name:
-          - *web-ap-2-name
-        <<: *web-ap-2-ip-address
-        port:
-          - *web-service-port
-      - name:
-          - *web-ap-2-name
-      - <<: *web-ap-2-ip-address
-        port: 
-          - *ap-service-port
-  - name:
-      - &l2-lb-name
-        l2-lb 
-    ip-addresses:
-      - &l2-lb-ip-address
-        ip-address: 
-          - 10.18.119.136
-          - vip: yes
-      - url: http://portamls.bb.local
+      - name: *web-ap-2-name
+        ip-address: *web-ap-2-ip-address
+        port: *web-service-port
+      - name: *web-ap-2-name
+        ip-address: *web-ap-2-ip-address
+        port: *ap-service-port
+  - name: &l2-lb-name
+          l2-lb 
+    network-interfaces:
+      - ip-address: &l2-lb-ip-address 
+                      10.18.119.136
+        vip: yes
+        url: http://portamls.bb.local
     middleware:
       - type: service
         port:
           - 80
     destinations: 
-      - name: 
-          - *rev-proxy-1-name
-        <<: *rev-proxy-1-ip-address
-        port:
-          - *rev-proxy-service-port
-      - name: 
-          - *rev-proxy-2-name
-        <<: *rev-proxy-2-ip-address
-        port: 
-          - *rev-proxy-service-port
-  - name:
-      - &l3-lb-name
-        l3-lb 
-    ip-addresses:
-      - &l3-lb-ip-address
-        ip-address: 
-          - 10.19.84.252
-          - vip: yes
-      - url: http://portamhs.bb.local
+      - name: *rev-proxy-1-name
+        ip-address: *rev-proxy-1-ip-address
+        port: *rev-proxy-service-port
+      - name: *rev-proxy-2-name
+        ip-address: *rev-proxy-2-ip-address
+        port: *rev-proxy-service-port
+  - name: &l3-lb-name
+          l3-lb 
+    network-interfaces:
+      - ip-address: &l3-lb-ip-address
+                  - 10.19.84.252
+        vip: yes
+        url: http://portamhs.bb.local
     middleware:
       - type: service
         port:
           - 80
     destinations: 
-      - name: 
-          - *rev-proxy-3-name
-        <<: *rev-proxy-3-ip-address
-        port: 
-          - *rev-proxy-service-port
-      - name: 
-          - *rev-proxy-4-name
-        <<: *rev-proxy-4-ip-address
-        port: 
-          - *rev-proxy-service-port
+      - name: *rev-proxy-3-name
+        ip-address: *rev-proxy-3-ip-address
+        port: *rev-proxy-service-port
+      - name: *rev-proxy-4-name
+        ip-address: *rev-proxy-4-ip-address
+        port: *rev-proxy-service-port
 

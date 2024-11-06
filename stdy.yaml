@@ -1,0 +1,179 @@
+servers:
+  - name: &db-server-name
+          db-server
+    network-interfaces:
+      - ip-address: &db-server-ip-address 
+                    10.85.28.217
+        vip: yes
+        netmask: 255.255.255.0 
+    middleware:
+      - type: service
+        name: &db-service-name      
+          postgresql
+        port: &db-service-port
+          9533
+        db-connect-infos:
+          - &db-connect-info-to-portam-app-dev
+            db-name: portam_app_dev
+            user: hoge
+            password: hoge
+          - &db-connect-info-to-portam-storage-dev
+            db-name: portam_storage_dev
+            user: hoge
+            password: hoge          
+  - name: &web-ap-1-name 
+      web/ap#1
+    network-interfaces:
+      - ip-address: &web-ap-1-ip-address 
+                    10.2.28.70
+        netmask: 255.255.255.0 
+    middleware:
+      - &web-service
+        type: service
+        name: &web-service-name
+              nginx
+        port: &web-service-port
+              80
+      -  &ap-service
+        type: service
+        name: &ap-service-name
+              node
+        port: &ap-service-port
+              5000
+    destinations: &web-ap-1-destinations
+      - name: *db-server-name
+        ip-address: *db-server-ip-address
+        port: *db-service-port
+        <<: *db-connect-info-to-portam-app-dev
+  - name: &web-ap-2-name
+          web/ap#2
+    network-interfaces:
+      - ip-address: &web-ap-2-ip-address 
+                    10.2.28.71
+        netmask: 255.255.255.0 
+    middleware: 
+      - <<: *web-service
+      - <<: *ap-service
+    destinations: 
+      *web-ap-1-destinations
+  - name: &rev-proxy-1-name
+          rev-proxy#1 
+    network-interfaces:
+      - - &rev-proxy-1-ip-address
+          ip-address: 10.18.134.242
+        - netmask: 255.255.255.0
+    middleware: &rev-proxy-1-middleware
+      - type: service
+        name: &rev-proxy-service-name
+              nginx
+        port: &rev-proxy-service-port
+              80
+    # destinations: &rev-proxy-1-destinations
+    #   - name: *web-ap-1-name
+    #     <<: *web-ap-1-ip-address
+    #     port: *web-service-port
+    #   - name: *web-ap-1-name  
+    #     <<: *web-ap-1-ip-address
+    #     port: *ap-service-port
+  # - name: &rev-proxy-2-name
+  #         rev-proxy#2 
+  #   network-interfaces:
+  #     - - &rev-proxy-2-ip-address
+  #         ip-address: 10.18.134.243
+  #       - netmask: 255.255.255.0
+  #   middleware:
+  #     *rev-proxy-1-middleware
+  #   destinations: &rev-proxy-1-destinations
+  #     - name: *web-ap-2-name
+  #       <<: *web-ap-2-ip-address
+  #       port: *web-service-port
+  #     - name: *web-ap-2-name
+  #     - <<: *web-ap-2-ip-address
+  #       port: *ap-service-port
+  # - name: &rev-proxy-3-name
+  #         rev-proxy#3
+  #   network-interfaces:
+  #     - - &rev-proxy-3-ip-address
+  #         ip-address: 10.86.2.109
+  #   middleware:
+  #     *rev-proxy-1-middleware
+  #   destinations: &rev-proxy-1-destinations
+  #     - name:
+  #         - *web-ap-1-name
+  #       <<: *web-ap-1-ip-address
+  #       port:
+  #         - *web-service-port
+  #     - name:
+  #         - *web-ap-1-name  
+  #       <<: *web-ap-1-ip-address
+  #       port: 
+  #         - *ap-service-port
+  # - name: 
+  #     - &rev-proxy-4-name
+  #       rev-proxy#4
+  #   ip-addresses:
+  #     - &rev-proxy-4-ip-address
+  #       ip-address:
+  #         - 10.86.2.110
+  #   middleware:
+  #     *rev-proxy-1-middleware
+  #   destinations: &rev-proxy-1-destinations
+  #     - name:
+  #         - *web-ap-2-name
+  #       <<: *web-ap-2-ip-address
+  #       port:
+  #         - *web-service-port
+  #     - name:
+  #         - *web-ap-2-name
+  #     - <<: *web-ap-2-ip-address
+  #       port: 
+  #         - *ap-service-port
+  # - name:
+  #     - &l2-lb-name
+  #       l2-lb 
+  #   ip-addresses:
+  #     - &l2-lb-ip-address
+  #       ip-address: 
+  #         - 10.18.119.136
+  #         - vip: yes
+  #     - url: http://portamls.bb.local
+  #   middleware:
+  #     - type: service
+  #       port:
+  #         - 80
+  #   destinations: 
+  #     - name: 
+  #         - *rev-proxy-1-name
+  #       <<: *rev-proxy-1-ip-address
+  #       port:
+  #         - *rev-proxy-service-port
+  #     - name: 
+  #         - *rev-proxy-2-name
+  #       <<: *rev-proxy-2-ip-address
+  #       port: 
+  #         - *rev-proxy-service-port
+  # - name:
+  #     - &l3-lb-name
+  #       l3-lb 
+  #   ip-addresses:
+  #     - &l3-lb-ip-address
+  #       ip-address: 
+  #         - 10.19.84.252
+  #         - vip: yes
+  #     - url: http://portamhs.bb.local
+  #   middleware:
+  #     - type: service
+  #       port:
+  #         - 80
+  #   destinations: 
+  #     - name: 
+  #         - *rev-proxy-3-name
+  #       <<: *rev-proxy-3-ip-address
+  #       port: 
+  #         - *rev-proxy-service-port
+  #     - name: 
+  #         - *rev-proxy-4-name
+  #       <<: *rev-proxy-4-ip-address
+  #       port: 
+  #         - *rev-proxy-service-port
+

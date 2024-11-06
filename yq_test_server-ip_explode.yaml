@@ -1,0 +1,218 @@
+servers:
+  - name:
+      - db-server
+    ip-addresses:
+      - ip-address:
+          - 10.85.28.217
+          - vip: yes
+    middleware:
+      - type: service
+        name:
+          - postgresql
+        port:
+          - 9533
+        db-connect-infos:
+          - db-name: portam_app_dev
+            user: hoge
+            password: hoge
+          - db-name: portam_storage_dev
+            user: hoge
+            password: hoge
+  - name:
+      - web/ap#1
+    ip-addresses:
+      - ip-address:
+          - 10.2.28.70
+    middleware:
+      - type: service
+        name:
+          - nginx
+        port:
+          - 80
+      - type: service
+        name:
+          - node
+        port:
+          - 5000
+    destinations:
+      - name:
+          - db-server
+        ip-address:
+          - 10.85.28.217
+          - vip: yes
+        port:
+          - 9533
+        db-name: portam_app_dev
+        user: hoge
+        password: hoge
+  - name:
+      - web/ap#2
+    ip-address:
+      - ip-address:
+          - 10.2.28.71
+    middleware:
+      - type: service
+        name:
+          - nginx
+        port:
+          - 80
+      - type: service
+        name:
+          - node
+        port:
+          - 5000
+    destinations:
+      - name:
+          - db-server
+        ip-address:
+          - 10.85.28.217
+          - vip: yes
+        port:
+          - 9533
+        db-name: portam_app_dev
+        user: hoge
+        password: hoge
+  - name:
+      - rev-proxy#1
+    ip-addresses:
+      - ip-address:
+          - 10.18.134.242
+    middleware:
+      - type: service
+        name:
+          - nginx
+        port:
+          - 80
+    destinations:
+      - name:
+          - web/ap#1
+        ip-address:
+          - 10.2.28.70
+        port:
+          - 80
+      - name:
+          - web/ap#1
+        ip-address:
+          - 10.2.28.70
+        port:
+          - 5000
+  - name:
+      - rev-proxy#2
+    ip-addresses:
+      - ip-address:
+          - 10.18.134.243
+    middleware:
+      - type: service
+        name:
+          - nginx
+        port:
+          - 80
+    destinations:
+      - name:
+          - web/ap#2
+        ip-address:
+          - 10.2.28.71
+        port:
+          - 80
+      - name:
+          - web/ap#2
+      - ip-address:
+          - 10.2.28.71
+        port:
+          - 5000
+  - name:
+      - rev-proxy#3
+    ip-addresses:
+      - ip-address:
+          - 10.86.2.109
+    middleware:
+      - type: service
+        name:
+          - nginx
+        port:
+          - 80
+    destinations:
+      - name:
+          - web/ap#1
+        ip-address:
+          - 10.2.28.70
+        port:
+          - 80
+      - name:
+          - web/ap#1
+        ip-address:
+          - 10.2.28.70
+        port:
+          - 5000
+  - name:
+      - rev-proxy#4
+    ip-addresses:
+      - ip-address:
+          - 10.86.2.110
+    middleware:
+      - type: service
+        name:
+          - nginx
+        port:
+          - 80
+    destinations:
+      - name:
+          - web/ap#2
+        ip-address:
+          - 10.2.28.71
+        port:
+          - 80
+      - name:
+          - web/ap#2
+      - ip-address:
+          - 10.2.28.71
+        port:
+          - 5000
+  - name:
+      - l2-lb
+    ip-addresses:
+      - ip-address:
+          - 10.18.119.136
+          - vip: yes
+      - url: http://portamls.bb.local
+    middleware:
+      - type: service
+        port:
+          - 80
+    destinations:
+      - name:
+          - rev-proxy#1
+        ip-address:
+          - 10.18.134.242
+        port:
+          - 80
+      - name:
+          - rev-proxy#2
+        ip-address:
+          - 10.18.134.243
+        port:
+          - 80
+  - name:
+      - l3-lb
+    ip-addresses:
+      - ip-address:
+          - 10.19.84.252
+          - vip: yes
+      - url: http://portamhs.bb.local
+    middleware:
+      - type: service
+        port:
+          - 80
+    destinations:
+      - name:
+          - rev-proxy#3
+        ip-address:
+          - 10.86.2.109
+        port:
+          - 80
+      - name:
+          - rev-proxy#4
+        ip-address:
+          - 10.86.2.110
+        port:
+          - 80
